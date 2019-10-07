@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<body>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
+<style>
+
+body {
+	font-size: 60px;
+	width: 100%;
+	font-family: 'Open Sans Condensed', sans-serif;
+}
+
+input[type=date] {
+	font-size: 60px;
+	font-family: 'Open Sans Condensed', sans-serif;
+}
+
+input[type=time] {
+	font-size: 60px;
+	font-family: 'Open Sans Condensed', sans-serif;
+}
+
+input[type=text] {
+	font-size: 60px;
+	font-family: 'Open Sans Condensed', sans-serif;
+}
+
+button {
+	border-radius: : 20px;
+	background-color: blue;
+	color: white;
+}
+
+</style>
+</head>
+<script src="scripts/jquery.js"></script>
+<script type="text/javascript">
+
+var action = "REGISTER A NEW COUNTDOWN"; // This string will be replaced with an md5 hash if it is to download a countdown
+
+var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
+var countDownIntervalInitialized = 0;
+var countDownInterval;
+
+function start_countdown(date_object) {
+	$.ajax( {
+		url: "countdown.cgi",
+		type: "POST",
+		data: date_object,
+		success: function(response) {
+			$("#count-down-a").attr("href", response["href"]);
+			$("#count-down-a").html("Proceed to count down");
+			$("#count-down-display-div").show();
+			$("#count-down-set-div").hide();
+		},
+		error: function() {
+			alert("Servern verkar inte svara! Fråga integratören vad det är frågan om.");
+		}
+	}
+	);
+
+}
+
+function start_countdown_display(date_string) {
+	countDownDate = new Date(date_string).getTime();
+
+	if ( countDownIntervalInitialized ) {
+		clearInterval(countDownInterval);
+	}
+
+	// Update the count down every 1 second
+	countDownInterval = setInterval(function() {
+
+	  // Get today's date and time
+	  var now = new Date().getTime();
+
+	  // Find the distance between now and the count down date
+	  var distance = countDownDate - now;
+
+	  // Time calculations for days, hours, minutes and seconds
+	  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+	  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+	  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+	  // Display the result in the element with id="demo"
+	  $("#count-down").html( days + "d " + hours + "h " + minutes + "m " + seconds + "s ");
+
+	  // If the count down is finished, write some text
+	  if (distance < 0) {
+	    clearInterval(countDownInterval);
+	    $("#count-down").html( "Count down EXPIRED! (" + date_string + ")" );
+	  }
+	}, 1000);
+
+}
+
+function get_countdown(md5hash) {
+	$.ajax( {
+			url: "countdown.cgi?getCountDown=" + md5hash,
+			type: "GET",
+			success: function(response) {
+				var countdown_date_string = response["count-down-to"];
+				var countdown_name = response["name"];
+
+				console.log("countdown_name: " + countdown_name);
+
+				$("#count-down-name").html(countdown_name);
+				start_countdown_display(countdown_date_string);
+			},
+			error: function() {
+				alert("Servern verkar inte svara! Fråga integratören vad det är frågan om.");
+			}
+		}
+	);
+
+}
+
+function START() {
+	var day = document.getElementById("count-down-set-date").value;
+	var time = document.getElementById("count-down-set-time").value;
+	var name = document.getElementById("count-down-name-in").value;
+
+	var regexp = /\d\d\d\d\-\d\d-\d\d_\d\d:\d\d/;
+
+	var date_string = day + "_" + time;
+
+	if ( date_string.match(regexp) ) {
+		var date_object = {"countdown": date_string, "name": name};
+		start_countdown(date_object);
+	} else {
+		alert("ENTER A VALID DAY AND TIME. NOTE: MUST SAY IF ITS AM or PM.");
+	}
+
+}
+
+function add_handlers() {
+	$(".overout")
+	.unbind("mouseover")
+	.unbind("mouseleave")
+	.mouseover(
+		function(){
+			$(this).fadeTo(100, 0.5);
+		}
+	)
+	.mouseleave( 
+		function(){
+			$(this).fadeTo(100,1.0);
+		}
+	);
+
+}
+
+window.onload = function(e) {
+	/*
+	* TODO: Stuff
+	*/
+
+	$("img").each(function(i){
+		$(this).addClass("overout");
+	})
+
+	add_handlers();
+
+	if ( action.endsWith("A NEW COUNTDOWN") ) {
+		$("#count-down-set-div").show();
+		$("#count-down-display-div").hide();
+	} else {
+		$("#count-down-set-div").hide();
+		$("#count-down-display-div").show();
+
+		get_countdown(action);
+	}
+}
+
+</script>
+
+
+<center>
+
+<div id="count-down-display-div" style="display:none;">
+<table id="count-down-table">
+	<tr>
+		<p id="count-down-name"></p>
+	</tr>
+	<tr>
+		<p id="count-down"></p>
+	</tr>
+	<tr>
+		<a href="/" id="count-down-a"></a>
+	</tr>
+</table>
+</div>
+
+<div id="count-down-set-div" style="display:none;">
+<table id="count-down-table">
+	<tr>
+		<td style="padding-right: 100px;">
+			<p id="count-down">Count down to:</p>
+		</td>
+	<td>
+		<input type="date" id="count-down-set-date">
+	</td>
+	<td>
+		<input type="time" id="count-down-set-time">
+	</td>
+	</tr>
+	<tr>
+		<td>
+			<p>What happens:</p>
+		</td>
+		<td>
+			<input type="text" id="count-down-name-in"></input>
+		</td>
+	</tr>
+</table>
+
+<img class="overout" src="img/start.png" onclick="START();">
+
+</div>
+
+</center>
+</div>
+</body>
+</html>

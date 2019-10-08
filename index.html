@@ -34,6 +34,12 @@ button {
 	color: white;
 }
 
+button.count-down-type-sel-btn {
+	height: 60px;
+	width: 160px;
+	border-radius: 20px;
+}
+
 </style>
 </head>
 <script src="scripts/jquery.js"></script>
@@ -44,6 +50,34 @@ var action = "REGISTER A NEW COUNTDOWN"; // This string will be replaced with an
 var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
 var countDownIntervalInitialized = 0;
 var countDownInterval;
+
+var TYPE_STANDARD = 0;
+var TYPE_LAST = 4;
+
+var type_units = ["Standard", "Antal gånger ljuset hinner åka från solen till jorden",
+"Världsrekord 100 meter", "Medellivslängder (Världen)"];
+
+var converters = [
+	function(seconds) { 
+		// standard
+		// Don't even use this value
+		return date;
+	},
+	function (seconds) {
+		// Antal gångenr ljuset hinner åka från solen till jorden
+		return seconds * 1.0 / 499;
+	},
+	function (seconds) {
+		// Världsrekord 100 meter
+		return seconds / 9.58;
+	},
+	function (seconds) {
+		// Meddellivslängd världen
+		return seconds / (69.0*365*24*60*60);
+	}
+];
+
+var countdown_mode = TYPE_STANDARD;
 
 function start_countdown(date_object) {
 	$.ajax( {
@@ -64,6 +98,37 @@ function start_countdown(date_object) {
 
 }
 
+function update_time() {
+	// Get today's date and time
+	var now = new Date().getTime();
+
+	// Find the distance between now and the count down date
+	var distance = countDownDate - now;
+
+	// Time calculations for days, hours, minutes and seconds
+	var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+	var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+	var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+	// Display the result in the element with id="demo"
+
+	if ( countdown_mode == TYPE_STANDARD ) {
+		$("#count-down").html( days + "d " + hours + "h " + minutes + "m " + seconds + "s ");
+	} else {
+		// Count all in seconds
+		seconds = seconds + minutes * 60 + hours * 60*60 + days * 24 * 60 * 60;
+		var measure_funny = converters[countdown_mode](seconds); 
+		$("#count-down").html( measure_funny );
+	}
+
+	// If the count down is finished, write some text
+	if (distance < 0) {
+	clearInterval(countDownInterval);
+	$("#count-down").html( "Count down EXPIRED! (" + date_string + ")" );
+	}
+}
+
 function start_countdown_display(date_string) {
 	countDownDate = new Date(date_string).getTime();
 
@@ -71,29 +136,12 @@ function start_countdown_display(date_string) {
 		clearInterval(countDownInterval);
 	}
 
+	$("#count-down-type-btn").show();
+
+	update_time();
 	// Update the count down every 1 second
 	countDownInterval = setInterval(function() {
-
-	  // Get today's date and time
-	  var now = new Date().getTime();
-
-	  // Find the distance between now and the count down date
-	  var distance = countDownDate - now;
-
-	  // Time calculations for days, hours, minutes and seconds
-	  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-	  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-	  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-	  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-	  // Display the result in the element with id="demo"
-	  $("#count-down").html( days + "d " + hours + "h " + minutes + "m " + seconds + "s ");
-
-	  // If the count down is finished, write some text
-	  if (distance < 0) {
-	    clearInterval(countDownInterval);
-	    $("#count-down").html( "Count down EXPIRED! (" + date_string + ")" );
-	  }
+		update_time();
 	}, 1000);
 
 }
@@ -154,6 +202,26 @@ function add_handlers() {
 
 }
 
+function switch_mode() {
+	var btn_id = "count-down-type-btn";
+
+	var current_mode = parseInt($("#"+btn_id).attr("value"));
+
+	console.log("current_mode: " + current_mode);
+
+	var next_mode = (current_mode + 1) % TYPE_LAST;
+
+	console.log("next_mode: " + next_mode);
+
+	$("#"+btn_id).html(type_units[next_mode]);
+
+	$("#"+btn_id).attr("value", next_mode);
+
+
+	console.log(countdown_mode);
+	countdown_mode = next_mode;
+}
+
 window.onload = function(e) {
 	/*
 	* TODO: Stuff
@@ -182,6 +250,7 @@ window.onload = function(e) {
 <center>
 
 <div id="count-down-display-div" style="display:none;">
+<center>
 <table id="count-down-table">
 	<tr>
 		<p id="count-down-name"></p>
@@ -193,9 +262,12 @@ window.onload = function(e) {
 		<a href="/" id="count-down-a"></a>
 	</tr>
 </table>
+<button style="display:none;" class="overout count-down-type-sel-btn" id="count-down-type-btn" onclick="switch_mode();" value=0>Standard</button>
+</center>
 </div>
 
 <div id="count-down-set-div" style="display:none;">
+<center>
 <table id="count-down-table">
 	<tr>
 		<td style="padding-right: 100px;">
@@ -216,6 +288,7 @@ window.onload = function(e) {
 			<input type="text" id="count-down-name-in"></input>
 		</td>
 	</tr>
+</center>
 </table>
 
 <img class="overout" src="img/start.png" onclick="START();">

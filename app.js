@@ -173,11 +173,15 @@ const server = http.createServer((req, res) => {
 		
 		var i = 1;
 
-
 		while ( req.url[i] == "/" )
 			i++;
 
 		var url = req.url.replace(/\/+/g,'/').substr(1);
+
+		var ip = req.headers['x-forwarded-for'] || 
+			req.connection.remoteAddress || 
+			req.socket.remoteAddress ||
+			(req.connection.socket ? req.connection.socket.remoteAddress : null);
 
 		var filereq = output_file(res,url);
 
@@ -266,6 +270,8 @@ const server = http.createServer((req, res) => {
 			if ( failed )
 				not_found(res);
 
+		} else {
+			timestamp_log( ip + ": " + req.url);
 		}
 
 	}

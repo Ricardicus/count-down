@@ -54,14 +54,18 @@ var countDownInterval;
 var TYPE_STANDARD = 0;
 var TYPE_LAST = 4;
 
-var type_units = ["Standard", "Antal gånger ljuset hinner åka från solen till jorden",
-"Världsrekord 100 meter", "Medellivslängder (Världen)"];
+var type_units = ["Standard", "Skäggmillimeter (5.7 nm per sekund)", "Antal gånger ljuset hinner åka från solen till jorden (499 sekunder)",
+"Världsrekord 100 meter (9.58 sekunder)", "Medellivslängd, världen (69 år)"];
 
 var converters = [
 	function(seconds) { 
 		// standard
 		// Don't even use this value
 		return date;
+	},
+	function (seconds) {
+		// millimeters of beard, average 5.7 nm per sec
+		return seconds * 0.0000057;
 	},
 	function (seconds) {
 		// Antal gångenr ljuset hinner åka från solen till jorden

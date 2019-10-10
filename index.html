@@ -35,8 +35,8 @@ button {
 }
 
 button.count-down-type-sel-btn {
-	height: 60px;
-	width: 160px;
+	height: 80px;
+	width: 260px;
 	border-radius: 20px;
 }
 
@@ -52,10 +52,10 @@ var countDownIntervalInitialized = 0;
 var countDownInterval;
 
 var TYPE_STANDARD = 0;
-var TYPE_LAST = 4;
+var TYPE_LAST = 5;
 
 var type_units = ["Standard", "Skäggmillimeter (5.7 nm per sekund)", "Antal gånger ljuset hinner åka från solen till jorden (499 sekunder)",
-"Världsrekord 100 meter (9.58 sekunder)", "Livslängder (meddellivslängd, världen, 69 år)"];
+"Kilometer Usain Bolt springer på maxfart (enl. världsrekord 100 m, 9.58 s)", "Livslängder (meddellivslängd, världen, 69 år)"];
 
 var converters = [
 	function(seconds) { 
@@ -73,7 +73,7 @@ var converters = [
 	},
 	function (seconds) {
 		// Världsrekord 100 meter
-		return seconds / 9.58;
+		return seconds * 10.44 / 1000.0;
 	},
 	function (seconds) {
 		// Meddellivslängd världen

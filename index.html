@@ -50,6 +50,7 @@ var action = "REGISTER A NEW COUNTDOWN"; // This string will be replaced with an
 var countDownDate = new Date("Jan 5, 2021 15:37:25").getTime();
 var countDownIntervalInitialized = 0;
 var countDownInterval;
+var countDownDateString;
 
 var TYPE_STANDARD = 0;
 var TYPE_LAST = 5;
@@ -128,13 +129,15 @@ function update_time() {
 
 	// If the count down is finished, write some text
 	if (distance < 0) {
-	clearInterval(countDownInterval);
-	$("#count-down").html( "Count down EXPIRED! (" + date_string + ")" );
+		clearInterval(countDownInterval);
+		$("#count-down").html( "Count down EXPIRED! (" + countDownDateString + ")" );
 	}
 }
 
 function start_countdown_display(date_string) {
 	countDownDate = new Date(date_string).getTime();
+
+	countDownDateString = date_string;
 
 	if ( countDownIntervalInitialized ) {
 		clearInterval(countDownInterval);

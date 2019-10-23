@@ -12,11 +12,9 @@ const hostname = '10.0.3.100';
 const port = 8080;
 
 // votes file
-var votes_file = "votes/votes.csv";
-var week_stats_file = "votes/votes_week.csv";
+var count_down_file = "count_downs.json";
 
-var count_downs = {}; // URL: tidsstämpel
-var count_down_names = {}; // URL: namn
+var count_downs = {}; // URL: tidsstämpel, URL-name: namn
 
 function not_found(res) {
 	res.statusCode = 404;
@@ -32,6 +30,20 @@ function send_json(response, object) {
   response.writeHead(200, {"Content-Type": "application/json"});
   var json = JSON.stringify(object);
   response.end(json);
+}
+
+function load_previous_countdowns() {
+	try {
+		var data = fs.readFileSync(count_down_file, 'utf8');
+		count_downs = JSON.parse(data)
+	} catch(e) {}
+}
+
+function store_countdowns() {
+	var data = JSON.stringify( count_downs )
+	fs.writeFile(count_down_file, data, (err) => {
+	  if (err) console.log(err);
+	});
 }
 
 function month_name_from_string_nbr(string_nbr)
@@ -66,6 +78,16 @@ function timestamp_log(log) {
 	console.log("[" + (new Date()).toISOString() + "] " + log);
 }
 
+function read_count_downs() {
+
+	var fs = require("fs");
+
+	fs.readFile("temp.txt", "utf-8", (err, data) => {
+		console.log(data);
+	});
+
+}
+
 function new_countdown(date_time, name) 
 {
 	var regexp = /\d\d\d\d\-\d\d-\d\d_\d\d:\d\d/;
@@ -88,7 +110,9 @@ function new_countdown(date_time, name)
 	 	                          + ", " + countdown_year + " " + coundown_time;
 
 	 	count_downs["/" + hash] = nice_date;
-	 	count_down_names["/" + hash] = name;
+	 	count_downs["/" + hash + "-name"] = name;
+
+	 	store_countdowns();
 
 	 	timestamp_log("Created a new countdown: " + hash);
 	 	timestamp_log("count_downs['" + hash + "']: " + count_downs["/" + hash]);
@@ -239,7 +263,7 @@ const server = http.createServer((req, res) => {
 							if ( count_down_path in count_downs ) {
 
 								var json_object = {"count-down-to": count_downs[count_down_path], 
-								"name": count_down_names[count_down_path]};
+								"name": count_downs[count_down_path + "-name"]};
 
 								send_json(res, json_object);
 
@@ -277,6 +301,9 @@ const server = http.createServer((req, res) => {
 	}
 
 });
+
+/* Load previous sessions */
+load_previous_countdowns();
 
 server.listen(port, hostname, () => {
 	console.log(`Server running at http://${hostname}:${port}/`);

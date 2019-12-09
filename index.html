@@ -123,7 +123,7 @@ function update_time() {
 	} else {
 		// Count all in seconds
 		seconds = seconds + minutes * 60 + hours * 60*60 + days * 24 * 60 * 60;
-		var measure_funny = converters[countdown_mode](seconds); 
+		var measure_funny = parseFloat(converters[countdown_mode](seconds)).toFixed(4); 
 		$("#count-down").html( measure_funny );
 	}
 

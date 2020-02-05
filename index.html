@@ -53,10 +53,11 @@ var countDownInterval;
 var countDownDateString;
 
 var TYPE_STANDARD = 0;
-var TYPE_LAST = 6;
+var TYPE_LAST = 7;
 
 var type_units = ["Standard", "Skäggmillimeter (5.7 nm per sekund)", "Antal gånger ljuset hinner åka från solen till jorden","Game of Thrones, alla säsonger",
-"Kilometer Usain Bolt springer på maxfart", "Meddellivslängd, världen"];
+"Kilometer Usain Bolt springer på maxfart", "Meddellivslängd, världen",
+"Meter en snigel hinner på maxfart (2.8 mm/s)"];
 
 var converters = [
 	function(seconds) { 
@@ -83,6 +84,10 @@ var converters = [
 	function (seconds) {
 		// Meddellivslängd världen
 		return seconds / (69.0*365*24*60*60);
+	},
+	function (seconds) {
+		// hur långt en snigel kommer
+		return seconds * 0.0028;
 	}
 ];
 

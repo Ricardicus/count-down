@@ -53,10 +53,10 @@ var countDownInterval;
 var countDownDateString;
 
 var TYPE_STANDARD = 0;
-var TYPE_LAST = 5;
+var TYPE_LAST = 6;
 
-var type_units = ["Standard", "Skäggmillimeter (5.7 nm per sekund)", "Antal gånger ljuset hinner åka från solen till jorden (499 sekunder)",
-"Kilometer Usain Bolt springer på maxfart (enl. världsrekord 100 m, 9.58 s)", "Livslängder (meddellivslängd, världen, 69 år)"];
+var type_units = ["Standard", "Skäggmillimeter (5.7 nm per sekund)", "Antal gånger ljuset hinner åka från solen till jorden","Game of Thrones, alla säsonger",
+"Kilometer Usain Bolt springer på maxfart", "Meddellivslängd, världen"];
 
 var converters = [
 	function(seconds) { 
@@ -71,6 +71,10 @@ var converters = [
 	function (seconds) {
 		// Antal gångenr ljuset hinner åka från solen till jorden
 		return seconds * 1.0 / 499;
+	},
+	function (seconds) {
+		// Game of thrones
+		return seconds / (252840.0);
 	},
 	function (seconds) {
 		// Världsrekord 100 meter

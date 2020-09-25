@@ -1,5 +1,4 @@
-FROM ubuntu
-RUN apt-get update
+FROM ubuntu:latest
 RUN apt-get install nodejs -y 
 #RUN rm -f package-lock.json
 RUN apt-get install npm -y

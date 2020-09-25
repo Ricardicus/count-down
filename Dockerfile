@@ -1,8 +1,10 @@
+# Pull base image, using Ubuntu latest
 FROM ubuntu:latest
-RUN apt-get install nodejs -y 
-#RUN rm -f package-lock.json
-RUN apt-get install npm -y
-RUN apt-get install apt-utils -y
+
+# Install Node.js
+RUN apt-get update && apt-get install --yes curl
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install --yes nodejs build-essential bison flex
 
 WORKDIR /usr/src/app
 
